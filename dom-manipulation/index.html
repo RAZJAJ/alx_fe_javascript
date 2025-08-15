@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic Quote Generator</title>
-  <!-- Tailwind CSS CDN for styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -18,28 +17,27 @@
     <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Dynamic Quote Generator</h1>
     <p class="text-sm text-gray-500 mb-8">Create and explore quotes on the fly.</p>
 
-    <!-- Main quote display section -->
+    <div class="mb-4">
+      <label for="categoryFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Category:</label>
+      <select id="categoryFilter" class="block w-full px-3 py-2 text-base border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></select>
+    </div>
+
     <div id="quoteDisplay" class="bg-indigo-50 p-6 rounded-xl mb-6 shadow-inner transition-all duration-300 transform hover:scale-105">
       <div class="text-xl font-medium text-gray-700 italic mb-2" id="quoteText"></div>
       <div class="text-sm text-indigo-600 font-semibold" id="quoteCategory"></div>
     </div>
 
-    <!-- Button to generate a new quote -->
     <button id="newQuoteBtn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition-colors duration-300 transform hover:scale-105 mb-8">
       Show New Quote
     </button>
 
-    <!-- Dynamic form for adding new quotes -->
     <div id="formContainer" class="border-t-2 border-dashed border-gray-200 pt-6"></div>
 
-    <!-- Container for import/export buttons -->
     <div class="mt-6 flex flex-col md:flex-row items-center justify-center gap-4">
-      <!-- Export button -->
       <button id="exportBtn" class="w-full md:w-auto bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-green-700 transition-colors duration-300 transform hover:scale-105">
         Export Quotes
       </button>
 
-      <!-- Import file input -->
       <label for="importFile" class="w-full md:w-auto bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-gray-700 transition-colors duration-300 cursor-pointer">
         Import Quotes
         <input type="file" id="importFile" accept=".json" class="hidden" />
