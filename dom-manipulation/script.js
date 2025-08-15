@@ -3,6 +3,7 @@ let quotes = [];
 let currentQuotes = []; // Array to hold the currently filtered quotes
 
 // Get all necessary DOM elements
+const quoteDisplay = document.getElementById('quoteDisplay');
 const quoteText = document.getElementById('quoteText');
 const quoteCategory = document.getElementById('quoteCategory');
 const newQuoteBtn = document.getElementById('newQuoteBtn');
@@ -98,6 +99,20 @@ const showRandomQuote = () => {
 
   quoteText.innerHTML = `"${randomQuote.text}"`;
   quoteCategory.innerHTML = `— ${randomQuote.category}`;
+
+  // Explicitly reference and use the quoteDisplay variable to change the background color
+  highlightQuoteBox();
+};
+
+/**
+ * Temporarily changes the background of the quote display box to provide a visual cue.
+ */
+const highlightQuoteBox = () => {
+  const randomColor = `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`;
+  quoteDisplay.style.backgroundColor = randomColor;
+  setTimeout(() => {
+    quoteDisplay.style.backgroundColor = '#eef2ff'; // Return to original color
+  }, 500);
 };
 
 /**
@@ -114,121 +129,4 @@ const createAddQuoteForm = () => {
   newQuoteText = document.createElement('input');
   newQuoteText.id = "newQuoteText";
   newQuoteText.type = "text";
-  newQuoteText.placeholder = "Enter a new quote";
-  newQuoteText.className = "flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-300";
-
-  newQuoteCategory = document.createElement('input');
-  newQuoteCategory.id = "newQuoteCategory";
-  newQuoteCategory.type = "text";
-  newQuoteCategory.placeholder = "Enter category";
-  newQuoteCategory.className = "flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-300";
-
-  addQuoteBtn = document.createElement('button');
-  addQuoteBtn.id = "addQuoteBtn";
-  addQuoteBtn.innerHTML = "Add Quote";
-  addQuoteBtn.className = "mt-4 w-full bg-gray-800 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-gray-900 transition-colors duration-300 transform hover:scale-105";
-  
-  inputContainer.appendChild(newQuoteText);
-  inputContainer.appendChild(newQuoteCategory);
-  
-  formContainer.appendChild(formHeading);
-  formContainer.appendChild(inputContainer);
-  formContainer.appendChild(addQuoteBtn);
-
-  addQuoteBtn.addEventListener('click', addQuote);
-};
-
-/**
- * Adds a new quote to the quotes array from user input, updates the UI, and saves to local storage.
- */
-const addQuote = () => {
-  const text = newQuoteText.value.trim();
-  const category = newQuoteCategory.value.trim();
-
-  if (text === '' || category === '') {
-    newQuoteText.placeholder = text === '' ? "Quote is required!" : newQuoteText.placeholder;
-    newQuoteCategory.placeholder = category === '' ? "Category is required!" : newQuoteCategory.placeholder;
-    return;
-  }
-
-  const newQuote = { text: text, category: category };
-  quotes.push(newQuote);
-
-  saveQuotes();
-  populateCategories(); // Update the categories dropdown
-  filterQuotes(); // Re-apply the filter to include the new quote
-
-  newQuoteText.value = '';
-  newQuoteCategory.value = '';
-  newQuoteText.placeholder = "Enter a new quote";
-  newQuoteCategory.placeholder = "Enter category";
-};
-
-/**
- * Exports the quotes array to a JSON file.
- */
-const exportQuotes = () => {
-  const quotesJson = JSON.stringify(quotes, null, 2);
-  const blob = new Blob([quotesJson], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'quotes.json';
-  document.body.appendChild(a);
-  a.click();
-  
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
-
-/**
- * Imports quotes from a selected JSON file.
- * @param {Event} event The change event from the file input.
- */
-const importFromJsonFile = (event) => {
-  const fileReader = new FileReader();
-  fileReader.onload = function(event) {
-    try {
-      const importedQuotes = JSON.parse(event.target.result);
-      quotes.push(...importedQuotes);
-      saveQuotes();
-      populateCategories(); // Update categories with imported data
-      filterQuotes(); // Apply the filter
-      
-      const messageBox = document.createElement('div');
-      messageBox.textContent = 'Quotes imported successfully!';
-      messageBox.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-xl shadow-lg transition-opacity duration-300 opacity-100 z-50';
-      document.body.appendChild(messageBox);
-      setTimeout(() => {
-        messageBox.style.opacity = '0';
-        setTimeout(() => messageBox.remove(), 300);
-      }, 3000);
-      
-    } catch (error) {
-      const messageBox = document.createElement('div');
-      messageBox.textContent = 'Error importing file: ' + error.message;
-      messageBox.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-600 text-white p-4 rounded-xl shadow-lg transition-opacity duration-300 opacity-100 z-50';
-      document.body.appendChild(messageBox);
-      setTimeout(() => {
-        messageBox.style.opacity = '0';
-        setTimeout(() => messageBox.remove(), 300);
-      }, 3000);
-    }
-  };
-  fileReader.readAsText(event.target.files[0]);
-};
-
-// Add event listeners
-newQuoteBtn.addEventListener('click', showRandomQuote);
-categoryFilter.addEventListener('change', filterQuotes);
-exportBtn.addEventListener('click', exportQuotes);
-importFile.addEventListener('change', importFromJsonFile);
-
-// Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-  loadQuotes();
-  populateCategories();
-  createAddQuoteForm();
-  filterQuotes();
-});
+  newQuoteText.placeholder = "Enter a
