@@ -187,7 +187,6 @@ const addQuote = async () => {
   quotes.push(newQuote);
   saveQuotes();
 
-  // Simulate sending the new quote to the server
   try {
     const response = await fetch(serverUrl, {
       method: 'POST',
@@ -208,25 +207,35 @@ const addQuote = async () => {
 };
 
 /**
- * Fetches quotes from the simulated server and merges them with local data.
- * @returns {Promise<void>}
+ * Fetches quotes from the simulated server.
+ * @returns {Promise<Array>} A promise that resolves to an array of quotes from the server.
  */
-const syncQuotes = async () => {
-  showNotification('Syncing with server...', 'info');
+const fetchQuotesFromServer = async () => {
   try {
     const response = await fetch(serverUrl);
     const serverQuotes = await response.json();
-    
-    // Simple conflict resolution: server data takes precedence.
-    // We'll just append server quotes to the local list, but in a real app,
-    // you would match based on a unique ID and merge/update.
-    const newQuotesFromServer = serverQuotes.map(q => ({
-      text: q.title, // JSONPlaceholder uses 'title' for its post content
+    // JSONPlaceholder uses 'title' for its post content, so we map it to 'text'.
+    return serverQuotes.map(q => ({
+      text: q.title,
       category: 'Server Sync' // All synced quotes get a generic category
     }));
-    
-    // Add only new quotes from the server that don't already exist locally.
-    const uniqueServerQuotes = newQuotesFromServer.filter(serverQuote => {
+  } catch (error) {
+    showNotification('Failed to fetch quotes from server.', 'error');
+    return [];
+  }
+};
+
+/**
+ * Fetches quotes from the simulated server and merges them with local data.
+ */
+const syncQuotes = async () => {
+  showNotification('Syncing with server...', 'info');
+  const serverQuotes = await fetchQuotesFromServer();
+  
+  if (serverQuotes.length > 0) {
+    // A simple conflict resolution strategy: server's data takes precedence.
+    // We add new quotes from the server that don't already exist locally.
+    const uniqueServerQuotes = serverQuotes.filter(serverQuote => {
       return !quotes.some(localQuote => localQuote.text === serverQuote.text);
     });
 
@@ -239,9 +248,8 @@ const syncQuotes = async () => {
     } else {
       showNotification('No new quotes found on server.', 'info');
     }
-
-  } catch (error) {
-    showNotification('Failed to sync with server. Please try again.', 'error');
+  } else {
+    showNotification('Could not retrieve quotes from server.', 'error');
   }
 };
 
