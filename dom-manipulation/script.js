@@ -217,7 +217,7 @@ const fetchQuotesFromServer = async () => {
     // JSONPlaceholder uses 'title' for its post content, so we map it to 'text'.
     return serverQuotes.map(q => ({
       text: q.title,
-      category: 'Server Sync' // All synced quotes get a generic category
+      category: 'Server Sync'
     }));
   } catch (error) {
     showNotification('Failed to fetch quotes from server.', 'error');
@@ -303,4 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   populateCategories();
   createAddQuoteForm();
   filterQuotes();
+  
+  // Automatically sync with the server every 60 seconds
+  setInterval(syncQuotes, 60000);
 });
