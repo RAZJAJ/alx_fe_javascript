@@ -246,7 +246,7 @@ const syncQuotes = async () => {
       filterQuotes();
       showNotification(`Synced ${uniqueServerQuotes.length} new quotes from server!`, 'success');
     } else {
-      showNotification('No new quotes found on server.', 'info');
+      showNotification('Quotes synced with server!', 'success');
     }
   } else {
     showNotification('Could not retrieve quotes from server.', 'error');
