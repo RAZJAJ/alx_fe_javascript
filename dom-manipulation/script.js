@@ -19,7 +19,7 @@ const addQuoteBtn = document.getElementById('addQuoteBtn');
 
 /**
  * Updates the DOM with a randomly selected quote from the quotes array.
- * This version uses bracket notation to access object properties.
+ * This version uses the innerHTML property.
  * @param {Event} event - The click event object (optional).
  */
 const showRandomQuote = (event) => {
@@ -30,8 +30,8 @@ const showRandomQuote = (event) => {
 
   // Handle the case where the quotes array might be empty
   if (quotes.length === 0) {
-    quoteText.textContent = "No quotes available. Add one!";
-    quoteCategory.textContent = "";
+    quoteText.innerHTML = "No quotes available. Add one!";
+    quoteCategory.innerHTML = "";
     return;
   }
   
@@ -39,10 +39,10 @@ const showRandomQuote = (event) => {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
 
-  // Update the text content of the quote and category elements using bracket notation
+  // Update the text content of the quote and category elements using innerHTML
   // The property names are passed as strings inside the brackets.
-  quoteText.textContent = `"${randomQuote['text']}"`;
-  quoteCategory.textContent = `— ${randomQuote['category']}`;
+  quoteText.innerHTML = `"${randomQuote['text']}"`;
+  quoteCategory.innerHTML = `— ${randomQuote['category']}`;
 };
 
 /**
