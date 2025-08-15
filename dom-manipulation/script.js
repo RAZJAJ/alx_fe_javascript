@@ -1,18 +1,13 @@
-// A simple array of quote objects. This can be extended dynamically.
-let quotes = [
-  { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
-  { text: "Life is what happens when you're busy making other plans.", category: "Life" },
-  { text: "The future belongs to those who believe in the beauty of their dreams.", category: "Dreams" },
-  { text: "The best way to predict the future is to create it.", category: "Future" },
-  { text: "Do not wait; the time will never be 'just right.'", category: "Action" },
-  { text: "Challenges are what make life interesting and overcoming them is what makes life meaningful.", category: "Challenges" }
-];
+// A simple array of quote objects. This will be synchronized with local storage.
+let quotes = [];
 
 // Get all necessary DOM elements
 const quoteText = document.getElementById('quoteText');
 const quoteCategory = document.getElementById('quoteCategory');
 const newQuoteBtn = document.getElementById('newQuoteBtn');
 const formContainer = document.getElementById('formContainer');
+const exportBtn = document.getElementById('exportBtn');
+const importFile = document.getElementById('importFile');
 
 // Variables for form elements that will be created dynamically
 let newQuoteText;
@@ -20,7 +15,34 @@ let newQuoteCategory;
 let addQuoteBtn;
 
 /**
+ * Saves the current quotes array to local storage.
+ */
+const saveQuotes = () => {
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+};
+
+/**
+ * Loads quotes from local storage when the application starts.
+ * If local storage is empty, it uses a default set of quotes.
+ */
+const loadQuotes = () => {
+  const storedQuotes = localStorage.getItem('quotes');
+  if (storedQuotes) {
+    quotes = JSON.parse(storedQuotes);
+  } else {
+    // Default quotes if local storage is empty
+    quotes = [
+      { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
+      { text: "Life is what happens when you're busy making other plans.", category: "Life" },
+      { text: "The future belongs to those who believe in the beauty of their dreams.", category: "Dreams" }
+    ];
+    saveQuotes(); // Save the initial quotes to local storage
+  }
+};
+
+/**
  * Updates the DOM with a randomly selected quote from the quotes array.
+ * This version uses the innerHTML property.
  */
 const showRandomQuote = () => {
   // Handle the case where the quotes array might be empty
@@ -103,6 +125,9 @@ const addQuote = () => {
   const newQuote = { text: text, category: category };
   quotes.push(newQuote);
 
+  // Save the updated quotes array to local storage
+  saveQuotes();
+
   // Clear the input fields for the next quote
   newQuoteText.value = '';
   newQuoteCategory.value = '';
@@ -115,11 +140,95 @@ const addQuote = () => {
   showRandomQuote();
 };
 
+/**
+ * Exports the quotes array to a JSON file and prompts the user to download it.
+ */
+const exportQuotes = () => {
+  // Convert the quotes array to a JSON string
+  const quotesJson = JSON.stringify(quotes, null, 2);
+  // Create a Blob object from the JSON string with the specified MIME type
+  const blob = new Blob([quotesJson], { type: 'application/json' });
+  // Create a temporary URL for the Blob object
+  const url = URL.createObjectURL(blob);
+  
+  // Create a temporary anchor element to trigger the download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quotes.json'; // The default filename for the download
+  document.body.appendChild(a); // Append to the body temporarily
+  a.click(); // Programmatically click the link to start the download
+  
+  // Clean up the temporary URL and element
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+/**
+ * Imports quotes from a selected JSON file.
+ * @param {Event} event The change event from the file input.
+ */
+const importFromJsonFile = (event) => {
+  const fileReader = new FileReader();
+  fileReader.onload = function(event) {
+    try {
+      // Parse the JSON data from the file
+      const importedQuotes = JSON.parse(event.target.result);
+      // Append the imported quotes to the existing array
+      quotes.push(...importedQuotes);
+      // Save the combined quotes to local storage
+      saveQuotes();
+      
+      // Update the UI
+      showRandomQuote();
+      // Use a temporary message box instead of alert()
+      const messageBox = document.createElement('div');
+      messageBox.textContent = 'Quotes imported successfully!';
+      messageBox.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-xl shadow-lg transition-opacity duration-300 opacity-100 z-50';
+      document.body.appendChild(messageBox);
+      setTimeout(() => {
+        messageBox.style.opacity = '0';
+        setTimeout(() => messageBox.remove(), 300);
+      }, 3000);
+      
+    } catch (error) {
+      const messageBox = document.createElement('div');
+      messageBox.textContent = 'Error importing file: ' + error.message;
+      messageBox.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-600 text-white p-4 rounded-xl shadow-lg transition-opacity duration-300 opacity-100 z-50';
+      document.body.appendChild(messageBox);
+      setTimeout(() => {
+        messageBox.style.opacity = '0';
+        setTimeout(() => messageBox.remove(), 300);
+      }, 3000);
+    }
+  };
+  
+  // Read the content of the selected file as text
+  fileReader.readAsText(event.target.files[0]);
+};
+
+/**
+ * A simple demonstration of session storage.
+ * Stores the text of the last viewed quote in session storage.
+ */
+const updateSessionStorage = () => {
+  // Get the current quote text
+  const currentQuote = quoteText.innerHTML.replace(/"/g, '');
+  // Save it to session storage
+  sessionStorage.setItem('lastViewedQuote', currentQuote);
+};
+
 // Add event listeners
-newQuoteBtn.addEventListener('click', showRandomQuote);
+newQuoteBtn.addEventListener('click', () => {
+  showRandomQuote();
+  updateSessionStorage();
+});
+exportBtn.addEventListener('click', exportQuotes);
+importFile.addEventListener('change', importFromJsonFile);
 
 // Call functions to initialize the page
 document.addEventListener('DOMContentLoaded', () => {
-  showRandomQuote();
+  loadQuotes();
   createAddQuoteForm();
+  showRandomQuote();
+  updateSessionStorage();
 });
