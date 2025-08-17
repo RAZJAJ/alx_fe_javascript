@@ -1,9 +1,7 @@
-// A simple array of quote objects. This will be synchronized with local storage.
 let quotes = [];
-let currentQuotes = []; // Array to hold the currently filtered quotes
-let serverUrl = 'https://jsonplaceholder.typicode.com/posts'; // Mock API endpoint
+let currentQuotes = [];
+let serverUrl = 'https://jsonplaceholder.typicode.com/posts';
 
-// Get all necessary DOM elements
 const quoteDisplay = document.getElementById('quoteDisplay');
 const quoteText = document.getElementById('quoteText');
 const quoteCategory = document.getElementById('quoteCategory');
@@ -15,14 +13,10 @@ const categoryFilter = document.getElementById('categoryFilter');
 const syncBtn = document.getElementById('syncBtn');
 const notification = document.getElementById('notification');
 
-// Variables for form elements that will be created dynamically
 let newQuoteText;
 let newQuoteCategory;
 let addQuoteBtn;
 
-/**
- * Displays a temporary notification message to the user.
- */
 const showNotification = (message, type) => {
   notification.textContent = message;
   notification.style.display = 'block';
@@ -39,16 +33,10 @@ const showNotification = (message, type) => {
   }, 3000);
 };
 
-/**
- * Saves the current quotes array to local storage.
- */
 const saveQuotes = () => {
   localStorage.setItem('quotes', JSON.stringify(quotes));
 };
 
-/**
- * Loads quotes from local storage when the application starts.
- */
 const loadQuotes = () => {
   const storedQuotes = localStorage.getItem('quotes');
   if (storedQuotes) {
@@ -63,9 +51,6 @@ const loadQuotes = () => {
   }
 };
 
-/**
- * Populates the category filter dropdown with unique categories from the quotes array.
- */
 const populateCategories = () => {
   const uniqueCategories = new Set(quotes.map(quote => quote.category));
   categoryFilter.innerHTML = '<option value="all">All Categories</option>';
@@ -82,9 +67,6 @@ const populateCategories = () => {
   }
 };
 
-/**
- * Filters the quotes array and updates the display.
- */
 const filterQuotes = () => {
   const selectedCategory = categoryFilter.value;
   localStorage.setItem('lastFilter', selectedCategory);
@@ -98,9 +80,6 @@ const filterQuotes = () => {
   showRandomQuote();
 };
 
-/**
- * Updates the DOM with a random quote.
- */
 const showRandomQuote = () => {
   if (currentQuotes.length === 0) {
     quoteText.innerHTML = "No quotes available for this category.";
@@ -117,9 +96,6 @@ const showRandomQuote = () => {
   highlightQuoteBox();
 };
 
-/**
- * Temporarily highlights the quote display box.
- */
 const highlightQuoteBox = () => {
   const randomColor = `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`;
   quoteDisplay.style.backgroundColor = randomColor;
@@ -128,9 +104,6 @@ const highlightQuoteBox = () => {
   }, 500);
 };
 
-/**
- * Creates the "Add Quote" form.
- */
 const createAddQuoteForm = () => {
   const formHeading = document.createElement('h2');
   formHeading.className = "text-xl font-bold text-gray-700 mb-4";
@@ -166,9 +139,6 @@ const createAddQuoteForm = () => {
   addQuoteBtn.addEventListener('click', addQuote);
 };
 
-/**
- * Adds a new quote.
- */
 const addQuote = async () => {
   const text = newQuoteText.value.trim();
   const category = newQuoteCategory.value.trim();
@@ -202,9 +172,6 @@ const addQuote = async () => {
   newQuoteCategory.value = '';
 };
 
-/**
- * Fetches quotes from the server.
- */
 const fetchQuotesFromServer = async () => {
   try {
     const response = await fetch(serverUrl);
@@ -219,9 +186,6 @@ const fetchQuotesFromServer = async () => {
   }
 };
 
-/**
- * Syncs quotes with the server.
- */
 const syncQuotes = async () => {
   showNotification('Syncing with server...', 'info');
   const serverQuotes = await fetchQuotesFromServer();
@@ -245,9 +209,6 @@ const syncQuotes = async () => {
   }
 };
 
-/**
- * Exports quotes to a JSON file.
- */
 const exportQuotes = () => {
   const quotesJson = JSON.stringify(quotes, null, 2);
   const blob = new Blob([quotesJson], { type: 'application/json' });
@@ -261,9 +222,6 @@ const exportQuotes = () => {
   URL.revokeObjectURL(url);
 };
 
-/**
- * Imports quotes from a JSON file.
- */
 const importFromJsonFile = (event) => {
   const fileReader = new FileReader();
   fileReader.onload = function(event) {
@@ -281,18 +239,16 @@ const importFromJsonFile = (event) => {
   fileReader.readAsText(event.target.files[0]);
 };
 
-// Event listeners
 newQuoteBtn.addEventListener('click', showRandomQuote);
 categoryFilter.addEventListener('change', filterQuotes);
 exportBtn.addEventListener('click', exportQuotes);
 importFile.addEventListener('change', importFromJsonFile);
 syncBtn.addEventListener('click', syncQuotes);
 
-// Initialize app
 document.addEventListener('DOMContentLoaded', () => {
   loadQuotes();
   populateCategories();
   createAddQuoteForm();
   filterQuotes();
-  setInterval(syncQuotes, 60000); // Auto-sync every 60s
+  setInterval(syncQuotes, 60000);
 });
