@@ -22,8 +22,6 @@ let addQuoteBtn;
 
 /**
  * Displays a temporary notification message to the user.
- * @param {string} message - The message to display.
- * @param {string} type - The type of notification (e.g., 'success', 'error', 'info').
  */
 const showNotification = (message, type) => {
   notification.textContent = message;
@@ -50,7 +48,6 @@ const saveQuotes = () => {
 
 /**
  * Loads quotes from local storage when the application starts.
- * If local storage is empty, it uses a default set of quotes.
  */
 const loadQuotes = () => {
   const storedQuotes = localStorage.getItem('quotes');
@@ -86,7 +83,7 @@ const populateCategories = () => {
 };
 
 /**
- * Filters the quotes array based on the selected category and updates the display.
+ * Filters the quotes array and updates the display.
  */
 const filterQuotes = () => {
   const selectedCategory = categoryFilter.value;
@@ -102,7 +99,7 @@ const filterQuotes = () => {
 };
 
 /**
- * Updates the DOM with a randomly selected quote from the currently filtered quotes array.
+ * Updates the DOM with a random quote.
  */
 const showRandomQuote = () => {
   if (currentQuotes.length === 0) {
@@ -121,7 +118,7 @@ const showRandomQuote = () => {
 };
 
 /**
- * Temporarily changes the background of the quote display box to provide a visual cue.
+ * Temporarily highlights the quote display box.
  */
 const highlightQuoteBox = () => {
   const randomColor = `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`;
@@ -132,7 +129,7 @@ const highlightQuoteBox = () => {
 };
 
 /**
- * Creates and appends the "Add Quote" form to the DOM.
+ * Creates the "Add Quote" form.
  */
 const createAddQuoteForm = () => {
   const formHeading = document.createElement('h2');
@@ -170,8 +167,7 @@ const createAddQuoteForm = () => {
 };
 
 /**
- * Adds a new quote to the quotes array from user input, updates the UI, and saves to local storage.
- * It also sends the new quote to the server.
+ * Adds a new quote.
  */
 const addQuote = async () => {
   const text = newQuoteText.value.trim();
@@ -207,14 +203,12 @@ const addQuote = async () => {
 };
 
 /**
- * Fetches quotes from the simulated server.
- * @returns {Promise<Array>} A promise that resolves to an array of quotes from the server.
+ * Fetches quotes from the server.
  */
 const fetchQuotesFromServer = async () => {
   try {
     const response = await fetch(serverUrl);
     const serverQuotes = await response.json();
-    // JSONPlaceholder uses 'title' for its post content, so we map it to 'text'.
     return serverQuotes.map(q => ({
       text: q.title,
       category: 'Server Sync'
@@ -226,15 +220,13 @@ const fetchQuotesFromServer = async () => {
 };
 
 /**
- * Fetches quotes from the simulated server and merges them with local data.
+ * Syncs quotes with the server.
  */
 const syncQuotes = async () => {
   showNotification('Syncing with server...', 'info');
   const serverQuotes = await fetchQuotesFromServer();
   
   if (serverQuotes.length > 0) {
-    // A simple conflict resolution strategy: server's data takes precedence.
-    // We add new quotes from the server that don't already exist locally.
     const uniqueServerQuotes = serverQuotes.filter(serverQuote => {
       return !quotes.some(localQuote => localQuote.text === serverQuote.text);
     });
@@ -254,7 +246,7 @@ const syncQuotes = async () => {
 };
 
 /**
- * Exports the quotes array to a JSON file.
+ * Exports quotes to a JSON file.
  */
 const exportQuotes = () => {
   const quotesJson = JSON.stringify(quotes, null, 2);
@@ -270,8 +262,7 @@ const exportQuotes = () => {
 };
 
 /**
- * Imports quotes from a selected JSON file.
- * @param {Event} event The change event from the file input.
+ * Imports quotes from a JSON file.
  */
 const importFromJsonFile = (event) => {
   const fileReader = new FileReader();
@@ -290,20 +281,18 @@ const importFromJsonFile = (event) => {
   fileReader.readAsText(event.target.files[0]);
 };
 
-// Add event listeners
+// Event listeners
 newQuoteBtn.addEventListener('click', showRandomQuote);
 categoryFilter.addEventListener('change', filterQuotes);
 exportBtn.addEventListener('click', exportQuotes);
 importFile.addEventListener('change', importFromJsonFile);
 syncBtn.addEventListener('click', syncQuotes);
 
-// Initialize the application
+// Initialize app
 document.addEventListener('DOMContentLoaded', () => {
   loadQuotes();
   populateCategories();
   createAddQuoteForm();
   filterQuotes();
-  
-  // Automatically sync with the server every 60 seconds
-  setInterval(syncQuotes, 60000);
+  setInterval(syncQuotes, 60000); // Auto-sync every 60s
 });
