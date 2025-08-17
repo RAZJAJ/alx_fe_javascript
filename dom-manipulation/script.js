@@ -373,4 +373,57 @@ resolveServerBtn.addEventListener('click', () => {
       },
       local: { 
         text: conflictList.children[index].querySelector('.bg-green-50 p').textContent.replace(/"/g, ''),
-        category: conflictList.children[index].querySelector('.text-green-600').textContent.replace('Category: ', '
+        category: conflictList.children[index].querySelector('.text-green-600').textContent.replace('Category: ', '')
+      }
+    };
+  });
+  resolveConflicts(conflicts, 'server');
+});
+resolveLocalBtn.addEventListener('click', () => {
+  const conflicts = Array.from(conflictList.children).map((_, index) => {
+    return {
+      id: conflictList.children[index].querySelector('.font-bold').textContent.replace('Conflict for quote ID: ', ''),
+      server: { 
+        text: conflictList.children[index].querySelector('.bg-blue-50 p').textContent.replace(/"/g, ''),
+        category: conflictList.children[index].querySelector('.text-blue-600').textContent.replace('Category: ', '')
+      },
+      local: { 
+        text: conflictList.children[index].querySelector('.bg-green-50 p').textContent.replace(/"/g, ''),
+        category: conflictList.children[index].querySelector('.text-green-600').textContent.replace('Category: ', '')
+      }
+    };
+  });
+  resolveConflicts(conflicts, 'local');
+});
+keepBothBtn.addEventListener('click', () => {
+  const conflicts = Array.from(conflictList.children).map((_, index) => {
+    return {
+      id: conflictList.children[index].querySelector('.font-bold').textContent.replace('Conflict for quote ID: ', ''),
+      server: { 
+        text: conflictList.children[index].querySelector('.bg-blue-50 p').textContent.replace(/"/g, ''),
+        category: conflictList.children[index].querySelector('.text-blue-600').textContent.replace('Category: ', '')
+      },
+      local: { 
+        text: conflictList.children[index].querySelector('.bg-green-50 p').textContent.replace(/"/g, ''),
+        category: conflictList.children[index].querySelector('.text-green-600').textContent.replace('Category: ', '')
+      }
+    };
+  });
+  resolveConflicts(conflicts, 'both');
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  loadQuotes();
+  populateCategories();
+  createAddQuoteForm();
+  filterQuotes();
+  
+  // Check if we need to sync with the server
+  const lastSync = localStorage.getItem('lastSync');
+  const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
+  
+  if (!lastSync || lastSync < oneHourAgo) {
+    setTimeout(syncQuotes, 2000);
+  }
+});
